@@ -1,4 +1,4 @@
-// --- Inserisci qui il link JSON del tuo Google Sheet ---
+// --- Link JSON del Google Sheet ---
 const sheetURL = "https://spreadsheets.google.com/feeds/list/144RJ6KcZi9Ck8L19hwkG4CPVzQzxIbax7nfDbjXHSS4/od6/public/values?alt=json";
 
 // Prendi l'ID dalla URL
@@ -6,31 +6,40 @@ const urlParams = new URLSearchParams(window.location.search);
 const clienteID = urlParams.get('id');
 
 async function caricaDati() {
-    const res = await fetch(sheetURL);
-    let text = await res.text();
+    try {
+        const res = await fetch(sheetURL);
+        const json = await res.json();
 
-    // Estrarre JSON puro dal formato Google Sheet
-    const jsonText = text.substring(text.indexOf('{'), text.lastIndexOf('}')+1);
-    const data = JSON.parse(jsonText).table.rows;
+        const clienti = json.feed.entry.map(riga => ({
+            id: riga['gsx$id']?.$t.trim(),
+            nome: riga['gsx$cliente']?.$t.trim(),
+            appuntamenti: [
+                riga['gsx$appuntamento1']?.$t,
+                riga['gsx$appuntamento2']?.$t,
+                riga['gsx$appuntamento3']?.$t,
+                riga['gsx$appuntamento4']?.$t
+            ].filter(a => a && a.length > 0)
+        }));
 
-    // Trova il cliente con l'ID corretto
-    const cliente = data.find(r => r.c[0].v === clienteID);
-    if (!cliente) {
-        document.getElementById("nome-cliente").textContent = "Cliente non trovato";
-        return;
-    }
+        const cliente = clienti.find(c => c.id === clienteID);
 
-    // Mostra Nome/Cognome
-    document.getElementById("nome-cliente").textContent = cliente.c[1].v;
-
-    // Mostra gli appuntamenti
-    const lista = document.getElementById("lista-appuntamenti");
-    for (let i = 2; i <= 5; i++) { // colonne Appuntamento 1–4
-        if (cliente.c[i] && cliente.c[i].v) {
-            const li = document.createElement("li");
-            li.textContent = cliente.c[i].v;
-            lista.appendChild(li);
+        if (!cliente) {
+            document.getElementById("nome-cliente").textContent = "Cliente non trovato";
+            return;
         }
+
+        document.getElementById("nome-cliente").textContent = cliente.nome;
+
+        const lista = document.getElementById("lista-appuntamenti");
+        cliente.appuntamenti.forEach(app => {
+            const li = document.createElement("li");
+            li.textContent = app;
+            lista.appendChild(li);
+        });
+
+    } catch (err) {
+        console.error("Errore nel caricamento:", err);
+        document.getElementById("nome-cliente").textContent = "Errore nel caricamento dati";
     }
 }
 
