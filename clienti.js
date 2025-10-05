@@ -1,9 +1,6 @@
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4BtcuTCCI-CdMa_KZ-UA24JQRX7GNcufsNnrsQl9Pj5iN8ZwlbyacFl2gaEo20ftZOrkQ18wMoR_U/gviz/tq?tqx=out:json";
 
-const urlParams = new URLSearchParams(window.location.search);
-const clienteID = urlParams.get('id');
-
-async function caricaDati() {
+async function caricaDati(clienteID) {
     try {
         const res = await fetch(sheetURL);
         let text = await res.text();
@@ -28,18 +25,21 @@ async function caricaDati() {
 
         const cliente = clienti.find(c => c.id === clienteID);
 
+        const nomeElemento = document.getElementById("nome-cliente");
+        const listaElemento = document.getElementById("lista-appuntamenti");
+        listaElemento.innerHTML = ""; // svuota eventuali vecchi appuntamenti
+
         if (!cliente) {
-            document.getElementById("nome-cliente").textContent = "Cliente non trovato";
+            nomeElemento.textContent = "Cliente non trovato";
             return;
         }
 
-        document.getElementById("nome-cliente").textContent = cliente.nome;
+        nomeElemento.textContent = cliente.nome;
 
-        const lista = document.getElementById("lista-appuntamenti");
         cliente.appuntamenti.forEach(app => {
             const li = document.createElement("li");
             li.textContent = app;
-            lista.appendChild(li);
+            listaElemento.appendChild(li);
         });
 
     } catch (err) {
@@ -48,4 +48,12 @@ async function caricaDati() {
     }
 }
 
-caricaDati();
+// Evento click sul pulsante
+document.getElementById("cerca").addEventListener("click", () => {
+    const idInserito = document.getElementById("inputID").value.trim();
+    if (idInserito) {
+        caricaDati(idInserito);
+    } else {
+        alert("Per favore inserisci un ID valido.");
+    }
+});
