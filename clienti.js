@@ -1,33 +1,30 @@
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4BtcuTCCI-CdMa_KZ-UA24JQRX7GNcufsNnrsQl9Pj5iN8ZwlbyacFl2gaEo20ftZOrkQ18wMoR_U/gviz/tq?tqx=out:json";
+// Inserisci qui la tua chiave API
+const API_KEY = "AIzaSyB_B0LYZbg9lJZ-SiPOs-D6BUdLbda8IgE";
+
+// Inserisci qui l'ID del tuo Google Sheet (lo trovi nell'URL tra /d/ e /edit)
+const SPREADSHEET_ID = "144RJ6KcZi9Ck8L19hwkG4CPVzQzxIbax7nfDbjXHSS4";
+
+const sheetURL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1?key=${API_KEY}`;
 
 async function caricaDati(clienteID) {
     try {
         const res = await fetch(sheetURL);
-        let text = await res.text();
+        const json = await res.json();
 
-        // Rimuovere il wrapper google.visualization.Query.setResponse(...)
-        const jsonText = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
-        const json = JSON.parse(jsonText);
+        // json.values[0] contiene le intestazioni
+        const righe = json.values.slice(1); // Saltiamo le intestazioni
 
-        const data = json.table.rows;
-
-        // Mappa i dati
-        const clienti = data.map(riga => ({
-            id: riga.c[0]?.v,
-            nome: riga.c[1]?.v,
-            appuntamenti: [
-                riga.c[2]?.v,
-                riga.c[3]?.v,
-                riga.c[4]?.v,
-                riga.c[5]?.v
-            ].filter(a => a && a.length > 0)
+        const clienti = righe.map(riga => ({
+            id: riga[0],
+            nome: riga[1],
+            appuntamenti: riga.slice(2).filter(a => a)
         }));
 
         const cliente = clienti.find(c => c.id === clienteID);
 
         const nomeElemento = document.getElementById("nome-cliente");
         const listaElemento = document.getElementById("lista-appuntamenti");
-        listaElemento.innerHTML = ""; // svuota eventuali vecchi appuntamenti
+        listaElemento.innerHTML = ""; // pulisce lista precedente
 
         if (!cliente) {
             nomeElemento.textContent = "Cliente non trovato";
