@@ -1,5 +1,5 @@
 // --- Inserisci qui il link JSON del tuo Google Sheet ---
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4BtcuTCCI-CdMa_KZ-UA24JQRX7GNcufsNnrsQl9Pj5iN8ZwlbyacFl2gaEo20ftZOrkQ18wMoR_U/gviz/tq?tqx=out:json";
+const sheetURL = "https://spreadsheets.google.com/feeds/list/144RJ6KcZi9Ck8L19hwkG4CPVzQzxIbax7nfDbjXHSS4/od6/public/values?alt=json";
 
 // Prendi l'ID dalla URL
 const urlParams = new URLSearchParams(window.location.search);
