@@ -4,7 +4,7 @@ const API_KEY = "AIzaSyB_B0LYZbg9lJZ-SiPOs-D6BUdLbda8IgE";
 // Inserisci qui l'ID del tuo Google Sheet (lo trovi nell'URL tra /d/ e /edit)
 const SPREADSHEET_ID = "144RJ6KcZi9Ck8L19hwkG4CPVzQzxIbax7nfDbjXHSS4";
 
-const sheetURL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Sheet1?key=${API_KEY}`;
+const sheetURL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Foglio1?key=${API_KEY}`;
 
 async function caricaDati(clienteID) {
     try {
